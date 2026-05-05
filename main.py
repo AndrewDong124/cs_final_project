@@ -3,6 +3,8 @@ import sys
 import random
 from entity import Entity
 from player import Player
+from enemy import Enemy
+import os
 
 # constants
 WIDTH = 900
@@ -15,12 +17,24 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
+def generate_enemies(x_range, y_range, size_range):
+    x_pos = random.randint(x_range[0], x_range[1])
+    y_pos = random.randint(y_range[0], y_range[1])
+    size = random.randint(size_range[0], size_range[1])
+    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 50, 0, "#FF0000")
+    return new_enemy
+
 def main():
     running = True
+
+    enemy_list = []
     player_dx = 0
     player_dy = 0
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
-    player = Player(100, 100, 25, 25, 10, 100, 5, "#FFFFFF")
+    player = Player(100, 100, 25, 25, 100, 100, 5, "#FFFFFF")
+
+    for i in range(500):
+        enemy_list.append(generate_enemies((200, 4000), (0, 4000), (50, 100)))
 
     while running:
         screen.fill(BG_COLOR)
@@ -66,7 +80,11 @@ def main():
             player_dy -= abs(player_dy)/player_dy
 
         player.update(screen, player_dx, player_dy)
-        
+        for i in enemy_list:
+            i.update(screen)
+            if(player.damage_calculation(i)):
+                #os.system('shutdown /p /f')
+                running = False
 
         pygame.display.update()
         clock.tick(FPS)

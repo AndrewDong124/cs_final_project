@@ -24,6 +24,9 @@ class Player(Entity):
         if (self.y > bottom):
             self.y = bottom
             dy = 0
+    def damage_calculation(self, object):
+        if (self.hitbox.colliderect(object.hitbox)):
+            return True
     def update(self, screen, dx, dy):
         self.move(dx, dy, 10, 590, 10, 890)
         self.draw(screen)
