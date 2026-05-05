@@ -25,11 +25,13 @@ class Player(Entity):
             self.y = bottom
             dy = 0
     def attack(self, direction, object, screen):
-        self.hurtbox = pygame.Rect(self.x + (50 * direction[0]) , self.y + (50 * direction[1]), self.width, self.height)
+        self.hurtbox = pygame.Rect(self.x-self.height/2 + (self.width * direction[0]) , self.y-self.height/2 + (self.height * direction[1]), self.width, self.height)
         pygame.draw.rect(screen, "#00FF00", self.hurtbox)
         for i in object:
             if (self.hurtbox.colliderect(i.hitbox)):
-                object.remove(i)
+                i.damage_calculation(self.damage)
+                if (i.health == 0):
+                    object.remove(i)
             
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.hitbox)):

@@ -21,7 +21,7 @@ def generate_enemies(x_range, y_range, size_range):
     x_pos = random.randint(x_range[0], x_range[1])
     y_pos = random.randint(y_range[0], y_range[1])
     size = random.randint(size_range[0], size_range[1])
-    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 50, 0, "#FF0000")
+    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 10, 0, "#FF0000")
     return new_enemy
 
 def main():
@@ -31,11 +31,11 @@ def main():
     player_dx = 0
     player_dy = 0
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
-    leftFlag = False
-    player = Player(100, 100, 25, 25, 100, 100, 5, "#FFFFFF")
+    leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
+    player = Player(100, 100, 25, 25, 100, 100, 10, "#FFFFFF")
 
-    for i in range(20):
-        enemy_list.append(generate_enemies((200, 900), (0, 600), (50, 150)))
+    for i in range(2):
+        enemy_list.append(generate_enemies((200, 500), (0, 600), (50, 100)))
 
     while running:
         screen.fill(BG_COLOR)
@@ -54,6 +54,12 @@ def main():
                     dFlag = True
                 if event.key == pygame.K_LEFT:
                     leftFlag = True
+                if event.key == pygame.K_RIGHT:
+                    rightFlag = True
+                if event.key == pygame.K_UP:
+                    upFlag = True
+                if event.key == pygame.K_DOWN:
+                    downFlag = True
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     wFlag = False
@@ -61,8 +67,8 @@ def main():
                 if event.key == pygame.K_a or event.key == pygame.K_d:
                     aFlag = False
                     dFlag = False
-                if event.key == pygame.K_LEFT:
-                    leftFlag = False
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
         if (wFlag):
             player_dy = player_dy - 2
             if (player_dy <= -10):
@@ -85,11 +91,16 @@ def main():
             player_dy -= abs(player_dy)/player_dy
         
         if (leftFlag):
-            player.attack((1, 1), enemy_list, screen)
-
+            player.attack((-1, 0), enemy_list, screen)
+        if (rightFlag):
+            player.attack((1, 0), enemy_list, screen)
+        if (upFlag):
+            player.attack((0, -1), enemy_list, screen)
+        if (downFlag):
+            player.attack((0, 1), enemy_list, screen)
         player.update(screen, player_dx, player_dy)
         for i in enemy_list:
-            i.update(screen)
+            i.update(screen, player)
             if(player.damage_calculation(i)):
                 #os.system('shutdown /p /f')
                 running = False
