@@ -18,4 +18,4 @@ class Enemy(Entity):
             self.health -= player.damage
     def update(self, screen):
         self.draw(screen)
-        self.move(-4)
+        self.move(-4.5)

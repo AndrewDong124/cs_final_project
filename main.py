@@ -31,10 +31,11 @@ def main():
     player_dx = 0
     player_dy = 0
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
+    leftFlag = False
     player = Player(100, 100, 25, 25, 100, 100, 5, "#FFFFFF")
 
-    for i in range(500):
-        enemy_list.append(generate_enemies((200, 4000), (0, 4000), (50, 100)))
+    for i in range(20):
+        enemy_list.append(generate_enemies((200, 900), (0, 600), (50, 150)))
 
     while running:
         screen.fill(BG_COLOR)
@@ -51,6 +52,8 @@ def main():
                     sFlag = True
                 if event.key == pygame.K_d:
                     dFlag = True
+                if event.key == pygame.K_LEFT:
+                    leftFlag = True
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     wFlag = False
@@ -58,6 +61,8 @@ def main():
                 if event.key == pygame.K_a or event.key == pygame.K_d:
                     aFlag = False
                     dFlag = False
+                if event.key == pygame.K_LEFT:
+                    leftFlag = False
         if (wFlag):
             player_dy = player_dy - 2
             if (player_dy <= -10):
@@ -78,6 +83,9 @@ def main():
             player_dx -= abs(player_dx)/player_dx
         if (player_dy != 0):
             player_dy -= abs(player_dy)/player_dy
+        
+        if (leftFlag):
+            player.attack((1, 1), enemy_list, screen)
 
         player.update(screen, player_dx, player_dy)
         for i in enemy_list:
