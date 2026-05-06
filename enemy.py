@@ -7,13 +7,22 @@ class Enemy(Entity):
     def __init__(self, x, y, height, width, max_speed, health, damage, color):
         super().__init__(x, y, height, width, max_speed, health, damage, color)
         self.hitbox = pygame.Rect(self.x-self.width/2, self.y-self.height/2, self.width, self.height)
-    def move(self, player):
-        x_distance = player.x - self.x
-        y_distance = player.y - self.y
-        if (y_distance != 0):
-            ratio = x_distance/y_distance
-        self.x += ratio * x_distance*0.01
-        self.y += -5-(ratio*x_distance)*0.01
+    def move(self, player, top, bottom, right, left):
+        dx, dy = (player.x - self.x, player.y - self.y)
+        self.x += dx/25
+        self.y += dy/25
+        if (self.x > left):
+            self.x = left
+            dx = 0
+        if (self.x < right):
+            self.x = right
+            dx = 0
+        if (self.y < top):
+            self.y = top
+            dy = 0
+        if (self.y > bottom):
+            self.y = bottom
+            dy = 0
     def draw(self, screen):
         self.hitbox = pygame.Rect(self.x-self.width/2, self.y-self.height/2, self.width, self.height)
         pygame.draw.rect(screen, self.color, self.hitbox)
@@ -21,4 +30,4 @@ class Enemy(Entity):
         self.health -= damage
     def update(self, screen, player):
         self.draw(screen)
-        self.move(player)
+        self.move(player, 10, 590, 10, 890)

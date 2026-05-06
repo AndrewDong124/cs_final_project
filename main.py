@@ -32,9 +32,9 @@ def main():
     player_dy = 0
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
-    player = Player(100, 100, 25, 25, 100, 100, 10, "#FFFFFF")
+    player = Player(100, 100, 25, 25, 100, 100, 5, "#FFFFFF")
 
-    for i in range(2):
+    for i in range(20):
         enemy_list.append(generate_enemies((200, 500), (0, 600), (50, 100)))
 
     while running:
