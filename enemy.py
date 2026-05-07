@@ -1,6 +1,7 @@
 import pygame
 from entity import Entity
 from player import Player
+import random
 import math
 
 class Enemy(Entity):
@@ -8,9 +9,14 @@ class Enemy(Entity):
         super().__init__(x, y, height, width, max_speed, health, damage, color)
         self.hitbox = pygame.Rect(self.x-self.width/2, self.y-self.height/2, self.width, self.height)
     def move(self, player, top, bottom, right, left):
-        dx, dy = (player.x - self.x, player.y - self.y)
-        self.x += dx/25
-        self.y += dy/25
+        steps_number = max(abs(player.x-self.x)/8, abs(player.y-self.y)/8)
+
+        step_x = float(player.x-self.x)/steps_number
+        step_y = float(player.y-self.y)/steps_number
+
+        self.x += step_x
+        self.y += step_y
+
         if (self.x > left):
             self.x = left
             dx = 0
@@ -28,6 +34,8 @@ class Enemy(Entity):
         pygame.draw.rect(screen, self.color, self.hitbox)
     def damage_calculation(self, damage):
         self.health -= damage
+        self.x = random.randint(10, 590)
+        self.y = random.randint(10, 890)
     def update(self, screen, player):
         self.draw(screen)
         self.move(player, 10, 590, 10, 890)

@@ -1,5 +1,6 @@
 import pygame
 from entity import Entity
+from bullet import Bullet
 import math
 
 class Player(Entity):
@@ -24,14 +25,24 @@ class Player(Entity):
         if (self.y > bottom):
             self.y = bottom
             dy = 0
-    def attack(self, direction, object, screen):
-        self.hurtbox = pygame.Rect(self.x-self.height/2 + (self.width * direction[0]) , self.y-self.height/2 + (self.height * direction[1]), self.width, self.height)
-        pygame.draw.rect(screen, "#00FF00", self.hurtbox)
-        for i in object:
-            if (self.hurtbox.colliderect(i.hitbox)):
-                i.damage_calculation(self.damage)
-                if (i.health == 0):
-                    object.remove(i)
+    def dash(self, dash_x, dash_y, top, bottom, right, left, direction):
+        self.x += dash_x * direction[0]
+        self.y += dash_y * direction[1]
+        if (self.x > left):
+            self.x = left
+            dx = 0
+        if (self.x < right):
+            self.x = right
+            dx = 0
+        if (self.y < top):
+            self.y = top
+            dy = 0
+        if (self.y > bottom):
+            self.y = bottom
+            dy = 0
+    def attack(self, direction, objects, screen, dx, dy):
+        projectile = Bullet(self.x, self.y, 15, direction, (dx, dy), 1, "#00FF00")
+        projectile.update(screen, 10, 10, objects)
             
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.hitbox)):

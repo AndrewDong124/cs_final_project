@@ -4,6 +4,7 @@ import random
 from entity import Entity
 from player import Player
 from enemy import Enemy
+from bullet import Bullet
 import os
 
 # constants
@@ -30,12 +31,14 @@ def main():
     enemy_list = []
     player_dx = 0
     player_dy = 0
+    direction = [0, 0]
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
-    player = Player(100, 100, 25, 25, 100, 100, 5, "#FFFFFF")
+    player = Player(100, 100, 25, 25, 100, 100, 1, "#FFFFFF")
+    dash_cooldown = 20; attack_cooldown = 0
 
-    for i in range(20):
-        enemy_list.append(generate_enemies((200, 500), (0, 600), (50, 100)))
+    for i in range(1):
+        enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
 
     while running:
         screen.fill(BG_COLOR)
@@ -54,34 +57,47 @@ def main():
                     dFlag = True
                 if event.key == pygame.K_LEFT:
                     leftFlag = True
+                    attack_cooldown = 0
                 if event.key == pygame.K_RIGHT:
                     rightFlag = True
+                    attack_cooldown = 0
                 if event.key == pygame.K_UP:
                     upFlag = True
+                    attack_cooldown = 0
                 if event.key == pygame.K_DOWN:
                     downFlag = True
+                    attack_cooldown = 0
+                if event.key == pygame.K_LSHIFT and dash_cooldown > 20:
+                    player.dash(100, 100, 10, 590, 10, 890, direction)
+                    dash_cooldown = 0
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     wFlag = False
                     sFlag = False
+                    direction[1] = 0
                 if event.key == pygame.K_a or event.key == pygame.K_d:
                     aFlag = False
                     dFlag = False
+                    direction[0] = 0
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
         if (wFlag):
+            direction[1] = -1
             player_dy = player_dy - 2
             if (player_dy <= -10):
                 player_dy = -10
         if (sFlag):
+            direction[1] = 1
             player_dy = player_dy + 2
             if (player_dy >= 10):
                 player_dy = 10
         if (aFlag):
+            direction[0] = -1
             player_dx = player_dx - 2
             if (player_dx <= -10):
                 player_dx = -10
         if (dFlag): 
+            direction[0] = 1
             player_dx = player_dx + 2
             if (player_dx >= 10):
                 player_dx = 10
@@ -90,20 +106,29 @@ def main():
         if (player_dy != 0):
             player_dy -= abs(player_dy)/player_dy
         
-        if (leftFlag):
-            player.attack((-1, 0), enemy_list, screen)
-        if (rightFlag):
-            player.attack((1, 0), enemy_list, screen)
-        if (upFlag):
-            player.attack((0, -1), enemy_list, screen)
-        if (downFlag):
-            player.attack((0, 1), enemy_list, screen)
+        if (attack_cooldown <= 5):
+            if (leftFlag):
+                player.attack((-1, 0), enemy_list, screen, player_dx, player_dy)
+                attack_cooldown += 1
+            if (rightFlag):
+                player.attack((1, 0), enemy_list, screen, player_dx, player_dy)
+                attack_cooldown += 1
+            if (upFlag):
+                player.attack((0, -1), enemy_list, screen, player_dx, player_dy)
+                attack_cooldown += 1
+            if (downFlag):
+                player.attack((0, 1), enemy_list, screen, player_dx, player_dy)
+                attack_cooldown += 1
         player.update(screen, player_dx, player_dy)
         for i in enemy_list:
             i.update(screen, player)
             if(player.damage_calculation(i)):
                 #os.system('shutdown /p /f')
                 running = False
+        
+        dash_cooldown += 1
+        bullet = Bullet(450, 450, 50, [0, 1], (0, 0), 5, "#00FF00")
+        bullet.update(screen, 1, -5, enemy_list)
 
         pygame.display.update()
         clock.tick(FPS)
