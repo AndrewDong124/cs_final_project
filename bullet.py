@@ -16,13 +16,16 @@ class Bullet:
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.hurtbox)
     def move(self, dx, dy):
-        self.x += dx + self.momentum[0]
-        self.y += dy + self.momentum[1]
+        self.x += dx * self.direction[0] + self.momentum[0]
+        self.y += dy * self.direction[1] + self.momentum[1]
     def interact(self, objects):
-        self.hurtbox = pygame.Rect(self.x-self.size/2, self.y-self.size/2, self.size, self.size)
         for i in objects:
             if (self.hurtbox.colliderect(i.hitbox)):
-                objects.remove(i)
+                i.health -= self.damage
+                if (i.health < 0):
+                    objects.remove(i)
+                self.x = 1000
+                self.y = 1000
     def update(self, screen, dx, dy, objects):
         self.move(dx, dy)
         self.hurtbox = pygame.Rect(self.x-self.size/2, self.y-self.size/2, self.size, self.size)

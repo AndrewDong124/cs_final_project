@@ -22,13 +22,15 @@ def generate_enemies(x_range, y_range, size_range):
     x_pos = random.randint(x_range[0], x_range[1])
     y_pos = random.randint(y_range[0], y_range[1])
     size = random.randint(size_range[0], size_range[1])
-    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 10, 0, "#FF0000")
+    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 100, 0, "#FF0000")
     return new_enemy
 
 def main():
     running = True
+    bullet = Bullet(450, 450, 50, [0, 1], (0, 0), 5, "#00FF00")
 
     enemy_list = []
+    projectile_list = []
     player_dx = 0
     player_dy = 0
     direction = [0, 0]
@@ -108,27 +110,25 @@ def main():
         
         if (attack_cooldown <= 5):
             if (leftFlag):
-                player.attack((-1, 0), enemy_list, screen, player_dx, player_dy)
-                attack_cooldown += 1
+                player.attack((-1, 0), enemy_list, projectile_list, player_dx, player_dy)
             if (rightFlag):
-                player.attack((1, 0), enemy_list, screen, player_dx, player_dy)
-                attack_cooldown += 1
+                player.attack((1, 0), enemy_list, projectile_list, player_dx, player_dy)
             if (upFlag):
-                player.attack((0, -1), enemy_list, screen, player_dx, player_dy)
-                attack_cooldown += 1
+                player.attack((0, -1), enemy_list, projectile_list, player_dx, player_dy)
             if (downFlag):
-                player.attack((0, 1), enemy_list, screen, player_dx, player_dy)
-                attack_cooldown += 1
+                player.attack((0, 1), enemy_list, projectile_list, player_dx, player_dy)
         player.update(screen, player_dx, player_dy)
         for i in enemy_list:
             i.update(screen, player)
             if(player.damage_calculation(i)):
                 #os.system('shutdown /p /f')
                 running = False
+        if (len(projectile_list) != 0):
+            for i in projectile_list:
+                i.update(screen, 10, 10, enemy_list)
         
         dash_cooldown += 1
-        bullet = Bullet(450, 450, 50, [0, 1], (0, 0), 5, "#00FF00")
-        bullet.update(screen, 1, -5, enemy_list)
+
 
         pygame.display.update()
         clock.tick(FPS)

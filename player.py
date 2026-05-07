@@ -40,9 +40,9 @@ class Player(Entity):
         if (self.y > bottom):
             self.y = bottom
             dy = 0
-    def attack(self, direction, objects, screen, dx, dy):
+    def attack(self, direction, objects, projectile_list, dx, dy):
         projectile = Bullet(self.x, self.y, 15, direction, (dx, dy), 1, "#00FF00")
-        projectile.update(screen, 10, 10, objects)
+        projectile_list.append(projectile)
             
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.hitbox)):
