@@ -22,7 +22,7 @@ def generate_enemies(x_range, y_range, size_range):
     x_pos = random.randint(x_range[0], x_range[1])
     y_pos = random.randint(y_range[0], y_range[1])
     size = random.randint(size_range[0], size_range[1])
-    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 100, 0, "#FF0000")
+    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 5, 0, "#FF0000")
     return new_enemy
 
 def main():
@@ -34,6 +34,8 @@ def main():
     player_dx = 0
     player_dy = 0
     direction = [0, 0]
+    enemy_amount = 1
+    enemy_starting_speed = 1
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
     player = Player(100, 100, 25, 25, 100, 100, 1, "#FFFFFF")
@@ -59,16 +61,12 @@ def main():
                     dFlag = True
                 if event.key == pygame.K_LEFT:
                     leftFlag = True
-                    attack_cooldown = 0
                 if event.key == pygame.K_RIGHT:
                     rightFlag = True
-                    attack_cooldown = 0
                 if event.key == pygame.K_UP:
                     upFlag = True
-                    attack_cooldown = 0
                 if event.key == pygame.K_DOWN:
                     downFlag = True
-                    attack_cooldown = 0
                 if event.key == pygame.K_LSHIFT and dash_cooldown > 20:
                     player.dash(100, 100, 10, 590, 10, 890, direction)
                     dash_cooldown = 0
@@ -108,18 +106,22 @@ def main():
         if (player_dy != 0):
             player_dy -= abs(player_dy)/player_dy
         
-        if (attack_cooldown <= 5):
+        if (attack_cooldown >= 12):
             if (leftFlag):
                 player.attack((-1, 0), enemy_list, projectile_list, player_dx, player_dy)
+                attack_cooldown = 0
             if (rightFlag):
                 player.attack((1, 0), enemy_list, projectile_list, player_dx, player_dy)
+                attack_cooldown = 0
             if (upFlag):
                 player.attack((0, -1), enemy_list, projectile_list, player_dx, player_dy)
+                attack_cooldown = 0
             if (downFlag):
                 player.attack((0, 1), enemy_list, projectile_list, player_dx, player_dy)
+                attack_cooldown = 0
         player.update(screen, player_dx, player_dy)
         for i in enemy_list:
-            i.update(screen, player)
+            i.update(screen, player, enemy_list, enemy_starting_speed)
             if(player.damage_calculation(i)):
                 #os.system('shutdown /p /f')
                 running = False
@@ -128,6 +130,14 @@ def main():
                 i.update(screen, 10, 10, enemy_list)
         
         dash_cooldown += 1
+        attack_cooldown += 1
+
+        if (len(enemy_list) == 0):
+            enemy_amount += 1
+            enemy_starting_speed *= 1.5
+            for i in range(enemy_amount):
+                enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
+             
 
 
         pygame.display.update()
