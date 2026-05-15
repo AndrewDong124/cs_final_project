@@ -1,52 +1,95 @@
 import pygame
 from entity import Entity
-from bullet import Bullet
+import threading
 import math
 
 class Player(Entity):
-    def __init__(self, x, y, height, width, max_speed, health, damage, color):
+    def __init__(self, x, y, height, width, max_speed, health, damage, color, dx = 0, dy = 0):
         super().__init__(x, y, height, width, max_speed, health, damage, color)
-        self.hitbox = pygame.Rect(self.x-self.width/2, self.y-self.height/2, self.width, self.height)
+        self.dx = dx
+        self.dy = dy
+        self.grounded = False
+        self.gravity = 0.8
+        self.jump_counter = 0
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
     def draw(self, screen):
-        self.hitbox = pygame.Rect(self.x-self.width/2, self.y-self.height/2, self.width, self.height)
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         pygame.draw.rect(screen, self.color, self.hitbox)
-    def move(self, dx, dy, top, bottom, right, left):
-        self.x += dx
-        self.y += dy
-        if (self.x > left):
-            self.x = left
-            dx = 0
-        if (self.x < right):
-            self.x = right
-            dx = 0
-        if (self.y < top):
-            self.y = top
-            dy = 0
-        if (self.y > bottom):
-            self.y = bottom
-            dy = 0
-    def dash(self, dash_x, dash_y, top, bottom, right, left, direction):
-        self.x += dash_x * direction[0]
-        self.y += dash_y * direction[1]
-        if (self.x > left):
-            self.x = left
-            dx = 0
-        if (self.x < right):
-            self.x = right
-            dx = 0
-        if (self.y < top):
-            self.y = top
-            dy = 0
-        if (self.y > bottom):
-            self.y = bottom
-            dy = 0
-    def attack(self, direction, objects, projectile_list, dx, dy):
-        projectile = Bullet(self.x, self.y, 15, direction, (dx, dy), 1, "#00FF00")
-        projectile_list.append(projectile)
-            
+
+    # Source - https://stackoverflow.com/a/74333777
+    # Posted by Rabbid76
+    # Retrieved 2026-05-14, License - CC BY-SA 4.0
+    def move(self, objects):
+
+        self.y += self.dy
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        
+        for i in objects:
+            if self.hitbox.colliderect(i.hitbox):
+                if self.dy > 0:
+                    self.hitbox.bottom = i.hitbox.top
+                    self.y = self.hitbox.top
+                    self.dy = 0
+                if self.dy < 0:
+                    self.hitbox.top = i.hitbox.bottom
+                    self.y = self.hitbox.top
+                    self.dy = 0
+
+        self.x += self.dx
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        for i in objects:
+            if self.hitbox.colliderect(i.hitbox):
+                if self.dx > 0:
+                    self.hitbox.right = i.hitbox.left
+                    self.x = self.hitbox.left
+                if self.dx < 0:
+                    self.hitbox.left = i.hitbox.right
+                    self.x = self.hitbox.left
+
+    def jump(self, velocity):
+        if (not self.grounded and (self.jump_counter >= 100)):
+            return True
+        self.dy = -velocity
+        self.grounded = False
+        self.jump_counter += 1
+    def fall(self):
+        if (self.grounded):
+            return True
+        self.dy += self.gravity
+        self.y += self.dy
+    def dash(self, dash_x, dash_y, direction, dash_time):
+        if (direction[0] != 0 and direction[1] != 0):
+            self.x += dash_x * direction[0]/1.41
+            self.y += dash_y * direction[1]/1.41
+        else:
+            self.x += dash_x * direction[0]
+            self.y += dash_y * direction[1]
+        if (dash_time >= 4):
+            return False
+        return True
+
+    def attack(self, direction, objects, screen):
+        if (direction == (1, 0)):
+            self.hurtbox = pygame.Rect(self.x + self.width, self.y - self.height*1.5, self.width * 1.5, self.height * 3)
+        if (direction == (-1, 0)):
+            self.hurtbox = pygame.Rect(self.x - self.width*2.5, self.y - self.height*1.5, self.width * 1.5, self.height * 3)
+        if (direction == (0, 1)):
+            self.hurtbox = pygame.Rect(self.x - self.width*1.5, self.y - self.height*2.5, self.width * 3, self.height * 1.5)
+        if (direction == (0, -1)):
+            self.hurtbox = pygame.Rect(self.x - self.width*1.5, self.y + self.height * 1.5, self.width * 3, self.height * 1.5)
+        pygame.draw.rect(screen, self.color, self.hurtbox)
+        for i in objects:
+            if (self.hurtbox.colliderect(i.hitbox)):
+                i.health -= self.damage
+                if (i.health <= 0):
+                    objects.remove(i)
+                return i
+        return None
+
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.hitbox)):
             return True
-    def update(self, screen, dx, dy):
-        self.move(dx, dy, 10, 590, 10, 890)
+    def update(self, screen, floor):
+        self.fall()
+        self.move(floor)
         self.draw(screen)
