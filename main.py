@@ -29,6 +29,7 @@ def main():
     running = True
 
     enemy_list = []
+    in_dash = False
     player_dx = 0
     player_dy = 0
     direction = [0, 0]
@@ -37,7 +38,8 @@ def main():
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
     player = Player(100, 100, 25, 25, 100, 100, 1, "#FFFFFF")
-    attack_cooldown = 0;
+    dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
+
     for i in range(1):
         enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
     border_list = []
@@ -77,6 +79,10 @@ def main():
                 #     leftFlag = False
                 # if event.key == pygame.K_DOWN:
                 #     downFlag = True
+                if event.key == pygame.K_x and dash_bar >= 20:
+                    in_dash =  player.dash(30, 30, direction, dash_time)
+                    player.dy = 0
+                    dash_bar -= 20
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     wFlag = False
@@ -130,6 +136,13 @@ def main():
             if(player.damage_calculation(i)):
                 #os.system('shutdown /p /f')
                 running = False
+        if (in_dash == True):
+            dash_time += 1
+            in_dash = player.dash(40, 40, direction, dash_time)
+        else:
+            dash_time = 0
+        
+        dash_bar = min(dash_bar+1, 60)
         attack_cooldown += 1
 
         for i in border_list:

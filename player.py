@@ -57,6 +57,16 @@ class Player(Entity):
             return True
         self.dy += self.gravity
         self.y += self.dy
+    def dash(self, dash_x, dash_y, direction, dash_time):
+        if (direction[0] != 0 and direction[1] != 0):
+            self.x += dash_x * direction[0]/1.41
+            self.y += dash_y * direction[1]/1.41
+        else:
+            self.x += dash_x * direction[0]
+            self.y += dash_y * direction[1]
+        if (dash_time >= 4):
+            return False
+        return True
 
     def attack(self, direction, objects, screen):
         if (direction == (1, 0)):
