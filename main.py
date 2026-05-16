@@ -36,7 +36,7 @@ def main():
     enemy_starting_speed = 6
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
-    player = Player(100, 100, 25, 25, 100, 100, 1, "#FFFFFF")
+    player = Player(100, 800, 25, 25, 100, 100, 1, "#FFFFFF")
     dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
 
     # for i in range(1):

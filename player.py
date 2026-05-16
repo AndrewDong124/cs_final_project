@@ -23,10 +23,14 @@ class Player(Entity):
                 self.hitbox.bottom = i.hitbox.top
                 self.y = self.hitbox.top
                 self.dy = 0
+                self.grounded = True
+                self.jump_counter = 0
             if self.dy < 0:
                 self.hitbox.top = i.hitbox.bottom
                 self.y = self.hitbox.top
                 self.dy = 0
+        else:
+            self.grounded = False
     def x_detection(self, i):
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         if self.hitbox.colliderect(i.hitbox):
@@ -43,9 +47,7 @@ class Player(Entity):
     # Posted by Rabbid76
     # Retrieved 2026-05-14, License - CC BY-SA 4.0
     def move(self, objects):
-
         self.y += self.dy
-        
         for i in objects:
             self.y_detection(i)
 
@@ -54,7 +56,7 @@ class Player(Entity):
             self.x_detection(i)
 
     def jump(self, velocity):
-        if (not self.grounded and (self.jump_counter >= 100)):
+        if (not self.grounded and (self.jump_counter >= 2)):
             return True
         self.dy = -velocity
         self.grounded = False
