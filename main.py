@@ -36,11 +36,11 @@ def main():
     enemy_starting_speed = 6
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
-    player = Player(100, 800, 25, 25, 100, 100, 1, "#FFFFFF")
+    player = Player(100, 700, 25, 25, 100, 100, 1, "#FFFFFF")
     dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
 
-    # for i in range(1):
-    #     enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
+    for i in range(1):
+        enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
     border_list = []
     bottom_border = Floor(0, HEIGHT, WIDTH, 1000, "#FFFFFF"); border_list.append(bottom_border)
     left_border = Floor(-1002, 0, 1000, HEIGHT, "#FFFFFF"); border_list.append(left_border)
@@ -139,7 +139,7 @@ def main():
                 running = False
         if (in_dash == True):
             dash_time += 1
-            in_dash = player.dash(20, 20, direction, dash_time, combined_list)
+            in_dash = player.dash(18, 18, direction, dash_time, combined_list)
         else:
             dash_time = 0
         
