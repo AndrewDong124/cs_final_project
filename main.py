@@ -11,7 +11,6 @@ import os
 WIDTH = 900
 HEIGHT = 600
 FPS = 30
-
 BG_COLOR = "#000000"
 
 pygame.init()
@@ -40,8 +39,8 @@ def main():
     player = Player(100, 100, 25, 25, 100, 100, 1, "#FFFFFF")
     dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
 
-    for i in range(1):
-        enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
+    # for i in range(1):
+    #     enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
     border_list = []
     bottom_border = Floor(0, HEIGHT, WIDTH, 1000, "#FFFFFF"); border_list.append(bottom_border)
     left_border = Floor(-1002, 0, 1000, HEIGHT, "#FFFFFF"); border_list.append(left_border)
@@ -51,6 +50,8 @@ def main():
     for i in range(1000):
         floor = Floor(random.randrange(-5000, 850, 50), random.randrange(-5000, 850, 50), 50, 50, "#FF00FF")
         floor_list.append(floor)
+
+    combined_list = floor_list + border_list
 
     while running:
         screen.fill(BG_COLOR)
@@ -77,10 +78,10 @@ def main():
                 # if event.key == pygame.K_RIGHT:
                 #     rightFlag = True
                 #     leftFlag = False
-                # if event.key == pygame.K_DOWN:
+                # if event.key == pygame.K_DOWN:x
                 #     downFlag = True
                 if event.key == pygame.K_x and dash_bar >= 20:
-                    in_dash =  player.dash(30, 30, direction, dash_time)
+                    in_dash =  player.dash(25, 25, direction, dash_time, combined_list)
                     player.dy = 0
                     dash_bar -= 20
             if event.type == pygame.KEYUP:
@@ -130,7 +131,7 @@ def main():
         #         player.attack((0, -1), enemy_list, screen)
         #         attack_cooldown = 0
         combined_list = floor_list + border_list
-        player.update(screen, combined_list)
+        player.update(screen, combined_list, floor_list)
         for i in enemy_list:
             i.update(screen, player, enemy_list, enemy_starting_speed)
             if(player.damage_calculation(i)):
@@ -138,7 +139,7 @@ def main():
                 running = False
         if (in_dash == True):
             dash_time += 1
-            in_dash = player.dash(40, 40, direction, dash_time)
+            in_dash = player.dash(20, 20, direction, dash_time, combined_list)
         else:
             dash_time = 0
         

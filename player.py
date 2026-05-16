@@ -15,6 +15,29 @@ class Player(Entity):
     def draw(self, screen):
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         pygame.draw.rect(screen, self.color, self.hitbox)
+    
+    def y_detection(self, i):
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        if self.hitbox.colliderect(i.hitbox):
+            if self.dy > 0:
+                self.hitbox.bottom = i.hitbox.top
+                self.y = self.hitbox.top
+                self.dy = 0
+            if self.dy < 0:
+                self.hitbox.top = i.hitbox.bottom
+                self.y = self.hitbox.top
+                self.dy = 0
+    def x_detection(self, i):
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        if self.hitbox.colliderect(i.hitbox):
+            if self.dx > 0:
+                self.hitbox.right = i.hitbox.left
+                self.x = self.hitbox.left
+            if self.dx < 0:
+                self.hitbox.left = i.hitbox.right
+                self.x = self.hitbox.left
+
+
 
     # Source - https://stackoverflow.com/a/74333777
     # Posted by Rabbid76
@@ -22,29 +45,13 @@ class Player(Entity):
     def move(self, objects):
 
         self.y += self.dy
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         
         for i in objects:
-            if self.hitbox.colliderect(i.hitbox):
-                if self.dy > 0:
-                    self.hitbox.bottom = i.hitbox.top
-                    self.y = self.hitbox.top
-                    self.dy = 0
-                if self.dy < 0:
-                    self.hitbox.top = i.hitbox.bottom
-                    self.y = self.hitbox.top
-                    self.dy = 0
+            self.y_detection(i)
 
         self.x += self.dx
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         for i in objects:
-            if self.hitbox.colliderect(i.hitbox):
-                if self.dx > 0:
-                    self.hitbox.right = i.hitbox.left
-                    self.x = self.hitbox.left
-                if self.dx < 0:
-                    self.hitbox.left = i.hitbox.right
-                    self.x = self.hitbox.left
+            self.x_detection(i)
 
     def jump(self, velocity):
         if (not self.grounded and (self.jump_counter >= 100)):
@@ -57,15 +64,28 @@ class Player(Entity):
             return True
         self.dy += self.gravity
         self.y += self.dy
-    def dash(self, dash_x, dash_y, direction, dash_time):
-        if (direction[0] != 0 and direction[1] != 0):
-            self.x += dash_x * direction[0]/1.41
-            self.y += dash_y * direction[1]/1.41
-        else:
-            self.x += dash_x * direction[0]
-            self.y += dash_y * direction[1]
-        if (dash_time >= 4):
+    def dash(self, dash_x, dash_y, direction, dash_time, objects):
+        if (dash_time >= 4 and dash_time <= 5):
+            self.dx = 0
+            self.dy = 0
+            return True
+        if (dash_time >= 6):
+            self.gravity = 1
             return False
+        self.gravity = 0
+        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        if (direction[0] != 0 and direction[1] != 0):
+            self.dy = dash_y * direction[1]/1.41
+            self.dx = dash_x * direction[0]/1.41
+        else:
+            self.dy = dash_y * direction[1]
+            self.dx += dash_x * direction[0]
+        self.y += self.dy
+        for i in objects:
+            self.y_detection(i)
+        self.x += self.dx
+        for i in objects:
+            self.x_detection(i)
         return True
 
     def attack(self, direction, objects, screen):
@@ -89,7 +109,9 @@ class Player(Entity):
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.hitbox)):
             return True
-    def update(self, screen, floor):
+    def update(self, screen, floor, objects):
         self.fall()
         self.move(floor)
         self.draw(screen)
+
+        

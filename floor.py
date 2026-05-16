@@ -15,5 +15,5 @@ class Floor:
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.hitbox)
     def move(self, dy):
-        self.y += dy
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.rel_y = self.y - dy
+        self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
