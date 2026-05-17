@@ -8,7 +8,7 @@ from floor import Floor
 import os
 
 # constants
-WIDTH = 900
+WIDTH = 1200
 HEIGHT = 600
 FPS = 30
 BG_COLOR = "#000000"
@@ -39,16 +39,14 @@ def main():
     player = Player(100, 700, 25, 25, 100, 100, 1, "#FFFFFF")
     dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
 
-    for i in range(1):
-        enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
     border_list = []
-    bottom_border = Floor(0, HEIGHT, WIDTH, 1000, "#FFFFFF"); border_list.append(bottom_border)
+    floor_list = []
+    bottom_border = Floor(0, HEIGHT-300, WIDTH, 1000, "#FFFFFF"); floor_list.append(bottom_border)
     left_border = Floor(-1002, 0, 1000, HEIGHT, "#FFFFFF"); border_list.append(left_border)
     right_border = Floor(WIDTH, 0, 1000, HEIGHT, "#FFFFFF"); border_list.append(right_border)
 
-    floor_list = []
-    for i in range(1000):
-        floor = Floor(random.randrange(-5000, 850, 50), random.randrange(-5000, 850, 50), 50, 50, "#FF00FF")
+    for i in range(200):
+        floor = Floor(random.randrange(0, WIDTH, 50), random.randrange(-5000-300, HEIGHT-50-300, 50), 50, 50, "#FF00FF")
         floor_list.append(floor)
 
     combined_list = floor_list + border_list

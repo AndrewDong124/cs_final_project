@@ -11,10 +11,13 @@ class Player(Entity):
         self.grounded = False
         self.gravity = 0.8
         self.jump_counter = 0
-        self.rel_y = 500
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.rel_y = 300-self.height
+        self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
+        self.real_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
     def draw(self, screen):
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+        print(f"y_pos: {self.y}")
+        self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
+        self.real_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         pygame.draw.rect(screen, self.color, self.hitbox)
     
     def y_detection(self, i):
@@ -62,6 +65,7 @@ class Player(Entity):
         self.dy = -velocity
         self.grounded = False
         self.jump_counter += 1
+
     def fall(self):
         if (self.grounded):
             return True
@@ -75,7 +79,7 @@ class Player(Entity):
         if (dash_time >= 5):
             self.gravity = 1
             return False
-        self.gravity = 0
+        self.gravity = -1
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         if (direction[0] != 0 and direction[1] != 0):
             self.dy = dash_y * direction[1]/1.41
@@ -91,24 +95,6 @@ class Player(Entity):
             self.x_detection(i)
         return True
 
-    def attack(self, direction, objects, screen):
-        if (direction == (1, 0)):
-            self.hurtbox = pygame.Rect(self.x + self.width, self.y - self.height*1.5, self.width * 1.5, self.height * 3)
-        if (direction == (-1, 0)):
-            self.hurtbox = pygame.Rect(self.x - self.width*2.5, self.y - self.height*1.5, self.width * 1.5, self.height * 3)
-        if (direction == (0, 1)):
-            self.hurtbox = pygame.Rect(self.x - self.width*1.5, self.y - self.height*2.5, self.width * 3, self.height * 1.5)
-        if (direction == (0, -1)):
-            self.hurtbox = pygame.Rect(self.x - self.width*1.5, self.y + self.height * 1.5, self.width * 3, self.height * 1.5)
-        pygame.draw.rect(screen, self.color, self.hurtbox)
-        for i in objects:
-            if (self.hurtbox.colliderect(i.hitbox)):
-                i.health -= self.damage
-                if (i.health <= 0):
-                    objects.remove(i)
-                return i
-        return None
-
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.hitbox)):
             return True
@@ -116,5 +102,7 @@ class Player(Entity):
         self.fall()
         self.move(floor)
         self.draw(screen)
+        for i in objects:
+            i.move(self.y)
 
         
