@@ -102,7 +102,6 @@ class Player(Entity):
         if (self.hitbox.colliderect(object.fake_hitbox)):
             return True
     def update(self, screen, floor, objects):
-        print(self.dash_counter)
         self.fall()
         self.move(floor)
         self.draw(screen)

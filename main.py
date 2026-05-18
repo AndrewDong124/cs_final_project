@@ -3,7 +3,7 @@ import sys
 import random
 from entity import Entity
 from player import Player
-from enemy import Enemy
+from doppel import Doppel
 from floor import Floor
 from hand import Hand
 import os
@@ -25,17 +25,13 @@ def main():
 
     enemy_list = []
     in_dash = False
-    player_dx = 0
-    player_dy = 0
     direction = [0, 0]
-    enemy_amount = 1
-    enemy_starting_speed = 10
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
-    leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
     player = Player(100, 700, 25, 25, 100, 100, 1, "#FFFFFF")
-    dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
+    attack_cooldown = 0; dash_time = 0
 
     hand = Hand(1, "#FF0000"); enemy_list.append(hand)
+    doppel = Doppel(0, 0, 0, 0)
 
     border_list = []
     floor_list = []
@@ -79,7 +75,7 @@ def main():
                 # if event.key == pygame.K_DOWN:x
                 #     downFlag = True
                 if event.key == pygame.K_x:
-                    in_dash =  player.dash(20, 20, direction, dash_time, combined_list)
+                    in_dash =  player.dash(18, 18, direction, dash_time, combined_list)
                     player.dy = 0
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
@@ -119,7 +115,7 @@ def main():
 
         if (in_dash == True):
             dash_time += 1
-            in_dash = player.dash(20, 20, direction, dash_time, combined_list)
+            in_dash = player.dash(25, 25, direction, dash_time, combined_list)
         else:
             dash_time = 0
         
@@ -133,13 +129,9 @@ def main():
         hand.update(screen, player.y, player)
         if (player.damage_calculation(hand)):
             running = False
-        
-
-        # if (len(enemy_list) == 0):
-        #     enemy_amount += 1
-        #     enemy_starting_speed *= 1.5
-        #     for i in range(enemy_amount):
-        #         enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
+        doppel.update(player.y, player, screen)
+        if (player.damage_calculation(doppel)):
+            running = False
 
         text_surface = font.render(height_text, True, "#FFFFFF")
         screen.blit(text_surface, (WIDTH/2-50, 20))

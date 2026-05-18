@@ -11,6 +11,7 @@ class Hand():
         self.x = 0; self.y = 500
         self.rel_y = self.y
         self.height = 1000
+        self.min_speed = 0.5
 
         self.fake_hitbox = pygame.Rect(self.x, self.rel_y, 1500, self.height)
         self.hitbox = pygame.Rect(self.x, self.y, 1500, self.height)
@@ -23,5 +24,6 @@ class Hand():
     def update(self, screen, dy, player):
         self.draw(screen)
         self.move(dy)
-        self.multiplier = max((self.y - player.y)/100, 0.8)
+        self.multiplier = max((self.y - player.y)/80, self.min_speed)
+        self.min_speed += 0.002
         self.speed = self.multiplier
