@@ -5,6 +5,7 @@ from entity import Entity
 from player import Player
 from enemy import Enemy
 from floor import Floor
+from hand import Hand
 import os
 
 # constants
@@ -15,6 +16,8 @@ BG_COLOR = "#000000"
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+font = pygame.font.SysFont('arial', 22)
+pygame.display.set_caption("Celeste?")
 clock = pygame.time.Clock()
 
 def generate_enemies(x_range, y_range, size_range):
@@ -33,17 +36,21 @@ def main():
     player_dy = 0
     direction = [0, 0]
     enemy_amount = 1
-    enemy_starting_speed = 6
+    enemy_starting_speed = 10
     wFlag = False; sFlag = False; dFlag = False; aFlag = False
     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
     player = Player(100, 700, 25, 25, 100, 100, 1, "#FFFFFF")
     dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
 
+    # for i in range(enemy_amount):
+    #     enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 25)))
+    hand = Hand(1, "#FF0000"); enemy_list.append(hand)
+
     border_list = []
     floor_list = []
     bottom_border = Floor(0, HEIGHT-300, WIDTH, 1000, "#FFFFFF"); floor_list.append(bottom_border)
-    left_border = Floor(-1002, 0, 1000, HEIGHT, "#FFFFFF"); border_list.append(left_border)
-    right_border = Floor(WIDTH, 0, 1000, HEIGHT, "#FFFFFF"); border_list.append(right_border)
+    left_border = Floor(-1002, -10000, 11000, HEIGHT, "#FFFFFF"); border_list.append(left_border)
+    right_border = Floor(WIDTH, -10000, 11000, HEIGHT, "#FFFFFF"); border_list.append(right_border)
 
     for i in range(200):
         floor = Floor(random.randrange(0, WIDTH, 50), random.randrange(-5000-300, HEIGHT-50-300, 50), 50, 50, "#FF00FF")
@@ -53,13 +60,18 @@ def main():
 
     while running:
         screen.fill(BG_COLOR)
+        height = round(-(player.y + 325)/10, 2)
+        height_text = f"height: {height}m"
+
+        text_surface = font.render(height_text, True, "#FFFFFF")
+        screen.blit(text_surface, (WIDTH/2-100, 20))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
-                    player.jump(8)
+                    player.jump(9.5)
                 if event.key == pygame.K_UP:
                     wFlag = True
                 if event.key == pygame.K_LEFT:
@@ -130,11 +142,11 @@ def main():
         #         attack_cooldown = 0
         combined_list = floor_list + border_list
         player.update(screen, combined_list, floor_list)
-        for i in enemy_list:
-            i.update(screen, player, enemy_list, enemy_starting_speed)
-            if(player.damage_calculation(i)):
-                #os.system('shutdown /p /f')
-                running = False
+        # for i in enemy_list:
+        #     i.update(screen, player, enemy_list, enemy_starting_speed)
+        #     if(player.damage_calculation(i)):
+        #         #os.system('shutdown /p /f')
+        #         running = False
         if (in_dash == True):
             dash_time += 1
             in_dash = player.dash(18, 18, direction, dash_time, combined_list)
@@ -148,6 +160,10 @@ def main():
             i.draw(screen)
         for i in floor_list:
             i.draw(screen)
+        
+        hand.update(screen, player.y, player)
+        if (player.damage_calculation(hand)):
+            running = False
         
 
         # if (len(enemy_list) == 0):

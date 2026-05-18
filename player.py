@@ -15,7 +15,6 @@ class Player(Entity):
         self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
         self.real_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
     def draw(self, screen):
-        print(f"y_pos: {self.y}")
         self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
         self.real_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
         pygame.draw.rect(screen, self.color, self.hitbox)
@@ -96,7 +95,7 @@ class Player(Entity):
         return True
 
     def damage_calculation(self, object):
-        if (self.hitbox.colliderect(object.hitbox)):
+        if (self.hitbox.colliderect(object.fake_hitbox)):
             return True
     def update(self, screen, floor, objects):
         self.fall()
