@@ -11,6 +11,7 @@ class Player(Entity):
         self.grounded = False
         self.gravity = 0.8
         self.jump_counter = 0
+        self.dash_counter = 0
         self.rel_y = 300-self.height
         self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
         self.real_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -28,6 +29,7 @@ class Player(Entity):
                 self.dy = 0
                 self.grounded = True
                 self.jump_counter = 0
+                self.dash_counter = 0
             if self.dy < 0:
                 self.hitbox.top = i.hitbox.bottom
                 self.y = self.hitbox.top
@@ -71,33 +73,36 @@ class Player(Entity):
         self.dy += self.gravity
         self.y += self.dy
     def dash(self, dash_x, dash_y, direction, dash_time, objects):
-        if (dash_time >= 4 and dash_time < 5):
-            self.dx = 0
-            self.dy = 0
+        if (self.dash_counter <= 1):
+            if (dash_time >= 4 and dash_time < 5):
+                self.dx = 0
+                self.dy = 0
+                return True
+            if (dash_time >= 5):
+                self.gravity = 1
+                self.dash_counter += 1
+                return False
+            self.gravity = -1
+            self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+            if (direction[0] != 0 and direction[1] != 0):
+                self.dy = dash_y * direction[1]/1.41
+                self.dx = dash_x * direction[0]/1.41
+            else:
+                self.dy = dash_y * direction[1]
+                self.dx += dash_x * direction[0]
+            self.y += self.dy
+            for i in objects:
+                self.y_detection(i)
+            self.x += self.dx
+            for i in objects:
+                self.x_detection(i)
             return True
-        if (dash_time >= 5):
-            self.gravity = 1
-            return False
-        self.gravity = -1
-        self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
-        if (direction[0] != 0 and direction[1] != 0):
-            self.dy = dash_y * direction[1]/1.41
-            self.dx = dash_x * direction[0]/1.41
-        else:
-            self.dy = dash_y * direction[1]
-            self.dx += dash_x * direction[0]
-        self.y += self.dy
-        for i in objects:
-            self.y_detection(i)
-        self.x += self.dx
-        for i in objects:
-            self.x_detection(i)
-        return True
 
     def damage_calculation(self, object):
         if (self.hitbox.colliderect(object.fake_hitbox)):
             return True
     def update(self, screen, floor, objects):
+        print(self.dash_counter)
         self.fall()
         self.move(floor)
         self.draw(screen)

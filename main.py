@@ -20,13 +20,6 @@ font = pygame.font.SysFont('arial', 22)
 pygame.display.set_caption("Celeste?")
 clock = pygame.time.Clock()
 
-def generate_enemies(x_range, y_range, size_range):
-    x_pos = random.randint(x_range[0], x_range[1])
-    y_pos = random.randint(y_range[0], y_range[1])
-    size = random.randint(size_range[0], size_range[1])
-    new_enemy = Enemy(x_pos, y_pos, size, size, 0, 5, 0, "#FF0000")
-    return new_enemy
-
 def main():
     running = True
 
@@ -42,15 +35,13 @@ def main():
     player = Player(100, 700, 25, 25, 100, 100, 1, "#FFFFFF")
     dash_bar = 20; attack_cooldown = 0; knockback_cooldown = 0; dash_time = 0
 
-    # for i in range(enemy_amount):
-    #     enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 25)))
     hand = Hand(1, "#FF0000"); enemy_list.append(hand)
 
     border_list = []
     floor_list = []
     bottom_border = Floor(0, HEIGHT-300, WIDTH, 1000, "#FFFFFF"); floor_list.append(bottom_border)
-    left_border = Floor(-1002, -10000, 11000, HEIGHT, "#FFFFFF"); border_list.append(left_border)
-    right_border = Floor(WIDTH, -10000, 11000, HEIGHT, "#FFFFFF"); border_list.append(right_border)
+    left_border = Floor(-1002, -10000, 1000, 11000, "#FFFFFF"); border_list.append(left_border)
+    right_border = Floor(WIDTH, -10000, 1000, 11000, "#FFFFFF"); border_list.append(right_border)
 
     for i in range(200):
         floor = Floor(random.randrange(0, WIDTH, 50), random.randrange(-5000-300, HEIGHT-50-300, 50), 50, 50, "#FF00FF")
@@ -60,11 +51,8 @@ def main():
 
     while running:
         screen.fill(BG_COLOR)
-        height = round(-(player.y + 325)/10, 2)
+        height = round(-(player.y + 325)/50, 2)
         height_text = f"height: {height}m"
-
-        text_surface = font.render(height_text, True, "#FFFFFF")
-        screen.blit(text_surface, (WIDTH/2-100, 20))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -90,10 +78,9 @@ def main():
                 #     leftFlag = False
                 # if event.key == pygame.K_DOWN:x
                 #     downFlag = True
-                if event.key == pygame.K_x and dash_bar >= 20:
-                    in_dash =  player.dash(25, 25, direction, dash_time, combined_list)
+                if event.key == pygame.K_x:
+                    in_dash =  player.dash(20, 20, direction, dash_time, combined_list)
                     player.dy = 0
-                    dash_bar -= 20
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     wFlag = False
@@ -126,34 +113,16 @@ def main():
                 player.dx = 10
         if (player.dx != 0):
             player.dx -= abs(player.dx)/player.dx
-        
-        # if (attack_cooldown >= 12):
-        #     if (leftFlag):
-        #         player.attack((-1, 0), enemy_list, screen)
-        #         attack_cooldown = 0
-        #     if (rightFlag):
-        #         player.attack((1, 0), enemy_list, screen)
-        #         attack_cooldown = 0
-        #     if (upFlag):
-        #         player.attack((0, 1), enemy_list, screen)
-        #         attack_cooldown = 0
-        #     if (downFlag):
-        #         player.attack((0, -1), enemy_list, screen)
-        #         attack_cooldown = 0
+
         combined_list = floor_list + border_list
         player.update(screen, combined_list, floor_list)
-        # for i in enemy_list:
-        #     i.update(screen, player, enemy_list, enemy_starting_speed)
-        #     if(player.damage_calculation(i)):
-        #         #os.system('shutdown /p /f')
-        #         running = False
+
         if (in_dash == True):
             dash_time += 1
-            in_dash = player.dash(18, 18, direction, dash_time, combined_list)
+            in_dash = player.dash(20, 20, direction, dash_time, combined_list)
         else:
             dash_time = 0
         
-        dash_bar = min(dash_bar+1, 60)
         attack_cooldown += 1
 
         for i in border_list:
@@ -171,6 +140,9 @@ def main():
         #     enemy_starting_speed *= 1.5
         #     for i in range(enemy_amount):
         #         enemy_list.append(generate_enemies((200, 500), (0, 600), (25, 50)))
+
+        text_surface = font.render(height_text, True, "#FFFFFF")
+        screen.blit(text_surface, (WIDTH/2-50, 20))
 
 
         pygame.display.update()
