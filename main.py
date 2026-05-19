@@ -31,7 +31,7 @@ def main():
     attack_cooldown = 0; dash_time = 0
 
     hand = Hand(1, "#FF0000"); enemy_list.append(hand)
-    doppel = Doppel(0, 0, 0, 0)
+    # doppel = Doppel(0, 0, 0, 0)
 
     border_list = []
     floor_list = []
@@ -39,11 +39,40 @@ def main():
     left_border = Floor(-1002, -10000, 1000, 11000, "#FFFFFF"); border_list.append(left_border)
     right_border = Floor(WIDTH, -10000, 1000, 11000, "#FFFFFF"); border_list.append(right_border)
 
-    for i in range(200):
-        floor = Floor(random.randrange(0, WIDTH, 50), random.randrange(-5000-300, HEIGHT-50-300, 50), 50, 50, "#FF00FF")
-        floor_list.append(floor)
 
     combined_list = floor_list + border_list
+    block_y = 4
+
+    for i in range(50):
+        floor_selection = random.randint(1, 20)
+        if (floor_selection > 9):
+            for j in range(40):
+                block = Floor(random.randrange(0, WIDTH-50, 50), random.randrange((block_y-10) * 50, block_y * 50, 50), 50, 50, "#FF00FF")
+                floor_list.append(block)
+            block_y -= 10
+        else:
+            file_name = "structures/struct" + str(floor_selection) + ".txt"
+            block_generation = open(file_name, "r")
+            line = block_generation.readline().strip()
+            while (line != ""):
+                line = block_generation.readline().strip()
+                for i in range(len(line)):
+                    if (line[i] == "#"):
+                        block = Floor(i*50, block_y * 50, 50, 50, "#FF00FF")
+                        floor_list.append(block)
+                block_y -= 1
+            block_generation.close()
+
+    # floor1 = open("structures/struct1.txt", "r")
+    # line = floor1.readline().strip()
+    # while (line != ""):
+    #     line = floor1.readline().strip()
+    #     for i in range(len(line)):
+    #         if (line[i] == "#"):
+    #             block = Floor(i*50, block_y * 50, 50, 50, "#FF00FF")
+    #             floor_list.append(block)
+    #     block_y -= 1
+    # floor1.close()
 
     while running:
         screen.fill(BG_COLOR)
@@ -66,14 +95,6 @@ def main():
                 if event.key == pygame.K_RIGHT:
                     dFlag = True
                     aFlag = False
-                # if event.key == pygame.K_LEFT:
-                #     leftFlag = True
-                #     rightFlag = False
-                # if event.key == pygame.K_RIGHT:
-                #     rightFlag = True
-                #     leftFlag = False
-                # if event.key == pygame.K_DOWN:x
-                #     downFlag = True
                 if event.key == pygame.K_x:
                     in_dash =  player.dash(18, 18, direction, dash_time, combined_list)
                     player.dy = 0
@@ -90,8 +111,6 @@ def main():
                 if event.key == pygame.K_RIGHT:
                     dFlag = False
                     direction[0] = 0
-                # if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                #     leftFlag = False; rightFlag = False; upFlag = False; downFlag = False
             
         if (wFlag):
             direction[1] = -1
@@ -129,9 +148,9 @@ def main():
         hand.update(screen, player.y, player)
         if (player.damage_calculation(hand)):
             running = False
-        doppel.update(player.y, player, screen)
-        if (player.damage_calculation(doppel)):
-            running = False
+        # doppel.update(player.y, player, screen)
+        # if (player.damage_calculation(doppel)):
+        #     running = False
 
         text_surface = font.render(height_text, True, "#FFFFFF")
         screen.blit(text_surface, (WIDTH/2-50, 20))

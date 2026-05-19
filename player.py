@@ -82,7 +82,7 @@ class Player(Entity):
                 self.gravity = 1
                 self.dash_counter += 1
                 return False
-            self.gravity = -1
+            self.gravity = 0
             self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
             if (direction[0] != 0 and direction[1] != 0):
                 self.dy = dash_y * direction[1]/1.41
