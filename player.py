@@ -13,6 +13,7 @@ class Player(Entity):
         self.jump_counter = 0
         self.dash_counter = 0
         self.rel_y = 300-self.height
+        self.camera_y = self.y
         self.hitbox = pygame.Rect(self.x, self.rel_y, self.width, self.height)
         self.real_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
     def draw(self, screen):
@@ -75,8 +76,8 @@ class Player(Entity):
     def dash(self, dash_x, dash_y, direction, dash_time, objects):
         if (self.dash_counter <= 1):
             if (dash_time >= 4 and dash_time < 5):
-                self.dx = 0
-                self.dy = 0
+                self.dx /= 3
+                self.dy /= 3
                 return True
             if (dash_time >= 5):
                 self.gravity = 1

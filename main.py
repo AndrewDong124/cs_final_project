@@ -17,6 +17,7 @@ BG_COLOR = "#000000"
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 font = pygame.font.SysFont('arial', 22)
+high_font = pygame.font.SysFont('arial', 12)
 pygame.display.set_caption("Celeste?")
 clock = pygame.time.Clock()
 
@@ -31,7 +32,8 @@ def main():
     attack_cooldown = 0; dash_time = 0
 
     hand = Hand(1, "#FF0000"); enemy_list.append(hand)
-    # doppel = Doppel(0, 0, 0, 0)
+    doppel = Doppel(0, 0, 0, 0)
+    doppel_spawn = False
 
     border_list = []
     floor_list = []
@@ -44,9 +46,9 @@ def main():
     block_y = 4
 
     for i in range(50):
-        floor_selection = random.randint(1, 20)
-        if (floor_selection > 9):
-            for j in range(40):
+        floor_selection = random.randint(1, 25)
+        if (floor_selection > 11):
+            for j in range(18):
                 block = Floor(random.randrange(0, WIDTH-50, 50), random.randrange((block_y-10) * 50, block_y * 50, 50), 50, 50, "#FF00FF")
                 floor_list.append(block)
             block_y -= 10
@@ -63,28 +65,24 @@ def main():
                 block_y -= 1
             block_generation.close()
 
-    # floor1 = open("structures/struct1.txt", "r")
-    # line = floor1.readline().strip()
-    # while (line != ""):
-    #     line = floor1.readline().strip()
-    #     for i in range(len(line)):
-    #         if (line[i] == "#"):
-    #             block = Floor(i*50, block_y * 50, 50, 50, "#FF00FF")
-    #             floor_list.append(block)
-    #     block_y -= 1
-    # floor1.close()
+    file = open("high_score.txt", "r")
+    high_score = file.read(); high_score.strip()
+    high_score_text = f"high score: {high_score}m"
 
     while running:
         screen.fill(BG_COLOR)
         height = round(-(player.y + 325)/50, 2)
         height_text = f"height: {height}m"
+        high_score_text = f"high score: {high_score}m"
+        if (height >= float(high_score)):
+            high_score = height
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
-                    player.jump(9.5)
+                    player.jump(10.5)
                 if event.key == pygame.K_UP:
                     wFlag = True
                 if event.key == pygame.K_LEFT:
@@ -148,16 +146,26 @@ def main():
         hand.update(screen, player.y, player)
         if (player.damage_calculation(hand)):
             running = False
-        # doppel.update(player.y, player, screen)
-        # if (player.damage_calculation(doppel)):
-        #     running = False
+        if (player.y <= -5000 or doppel_spawn == True):
+            doppel_spawn = True
+            doppel.update(player.y, player, screen)
+            if (player.damage_calculation(doppel)):
+                running = False
 
         text_surface = font.render(height_text, True, "#FFFFFF")
         screen.blit(text_surface, (WIDTH/2-50, 20))
+        high_text_surface = font.render(high_score_text, True, "#FFFFFF")
+        screen.blit(high_text_surface, (WIDTH/2-60, 50))
 
 
         pygame.display.update()
         clock.tick(FPS)
+    file = open("high_score.txt", "r")
+    high_score = file.read(); high_score.strip()
+    if (height >= float(high_score)):
+        file.close()
+        file = open("high_score.txt", "w")
+        file.write(str(height))
 
     
 
